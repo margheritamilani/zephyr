@@ -1,0 +1,4 @@
+description: MFX controller
+compatible: "st,mfx"
+
+include: [i2c-device.yaml]
