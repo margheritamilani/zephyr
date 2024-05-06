@@ -1,0 +1,21 @@
+menuconfig MFX
+    bool "MFX"
+    help
+    include MFX driver.
+
+if MFX
+
+module = MFX
+module-str = MFX
+source "subsys/logging/Kconfig.template.log_config"
+
+config MFX_INIT_PRIORITY
+    int "MFX init priority"
+    default 90
+    help
+        Set the priority of the MFX driver. 
+
+
+source "drivers/mfx_v3/Kconfig.mfx"
+
+endif

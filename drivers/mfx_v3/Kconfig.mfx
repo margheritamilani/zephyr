@@ -1,0 +1,9 @@
+config MFXV2
+    bool "MFXV2"
+    default y
+    depends on DT_HAS_MFX_ENABLED
+    select I2C
+    help
+	  Enable this option to use the multi function expander driver.
+
+
