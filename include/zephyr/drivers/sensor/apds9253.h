@@ -1,0 +1,21 @@
+/*
+ * Copyright (c) 2017 Intel Corporation
+ * Copyright (c) 2018 PHYTEC Messtechnik GmbH
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#ifndef ZEPHYR_DRIVERS_SENSOR_APDS9253_APDS9253_H_
+#define ZEPHYR_DRIVERS_SENSOR_APDS9253_APDS9253_H_
+
+enum sensor_attribute_apds9253 { SENSOR_ATTR_GAIN_MODE = SENSOR_ATTR_PRIV_START + 1 };
+
+enum sensor_gain_apds9253 {
+	APDS9253_SENSOR_GAIN_1,
+	APDS9253_SENSOR_GAIN_3,
+	APDS9253_SENSOR_GAIN_6,
+	APDS9253_SENSOR_GAIN_9,
+	APDS9253_SENSOR_GAIN_18,
+};
+
+#endif /* ZEPHYR_DRIVERS_SENSOR_APDS9253_APDS9253_H_*/

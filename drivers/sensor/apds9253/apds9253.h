@@ -85,6 +85,16 @@
 #define APDS9253_LS_THRES_VAR   0x27
 #define APDS9253_DK_CNT_STOR    0x29
 
+enum sensor_attribute_apds9253 { SENSOR_ATTR_GAIN_MODE = SENSOR_ATTR_PRIV_START + 1 };
+
+enum sensor_gain_apds9253 {
+	APDS9253_SENSOR_GAIN_1,
+	APDS9253_SENSOR_GAIN_3,
+	APDS9253_SENSOR_GAIN_6,
+	APDS9253_SENSOR_GAIN_9,
+	APDS9253_SENSOR_GAIN_18,
+};
+
 struct apds9253_config {
 	struct i2c_dt_spec i2c;
 	struct gpio_dt_spec int_gpio;
@@ -100,6 +110,7 @@ struct apds9253_data {
 	const struct device *dev;
 	uint32_t sample_crgb[4];
 	uint8_t pdata;
+	enum sensor_gain_apds9253 gain;
 	struct k_sem data_sem;
 };
 

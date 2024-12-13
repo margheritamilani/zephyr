@@ -121,9 +121,63 @@ static int apds9253_channel_get(const struct device *dev, enum sensor_channel ch
 	return 0;
 }
 
+static int apds9253_attr_set_gain(const struct device *dev, enum sensor_gain_apds9253 gain)
+{
+	const struct apds9253_config *config = dev->config;
+	struct apds9253_data *drv_data = dev->data;
+	uint8_t value;
+
+	if (drv_data->gain == gain) {
+		return 0;
+	}
+
+	switch (gain) {
+	case APDS9253_SENSOR_GAIN_1:
+		value = APDS9253_LS_GAIN_RANGE_1;
+		break;
+	case APDS9253_SENSOR_GAIN_3:
+		value = APDS9253_LS_GAIN_RANGE_3;
+		break;
+	case APDS9253_SENSOR_GAIN_6:
+		value = APDS9253_LS_GAIN_RANGE_6;
+		break;
+	case APDS9253_SENSOR_GAIN_9:
+		value = APDS9253_LS_GAIN_RANGE_9;
+		break;
+	case APDS9253_SENSOR_GAIN_18:
+		value = APDS9253_LS_GAIN_RANGE_18;
+		break;
+	default:
+		return -EINVAL;
+	}
+
+	if (i2c_reg_update_byte_dt(&config->i2c, APDS9253_LS_GAIN_REG, APDS9253_LS_GAIN_MASK,
+				   (value & APDS9253_LS_GAIN_MASK))) {
+		LOG_ERR("Not able to set light, sensor gain is not set");
+		return -EIO;
+	}
+
+	drv_data->gain = gain;
+
+	return 0;
+}
+
+static int apds9253_attr_set(const struct device *dev, enum sensor_channel chan,
+			     enum sensor_attribute attr, const struct sensor_value *val)
+{
+	int ret = -EINVAL;
+
+	if (((enum sensor_attribute_apds9253)attr) == SENSOR_ATTR_GAIN_MODE) {
+		ret = apds9253_attr_set_gain(dev, (enum sensor_gain_apds9253)val->val1);
+	}
+
+	return ret;
+}
+
 static int apds9253_sensor_setup(const struct device *dev)
 {
 	const struct apds9253_config *config = dev->config;
+	struct apds9253_data *drv_data = dev->data;
 	uint8_t chip_id;
 
 	if (i2c_reg_read_byte_dt(&config->i2c, APDS9253_PART_ID, &chip_id)) {
@@ -161,6 +215,8 @@ static int apds9253_sensor_setup(const struct device *dev)
 		LOG_ERR("Enable RGB mode failed");
 		return -EIO;
 	}
+
+	drv_data->gain = config->ls_gain;
 
 	return 0;
 }
@@ -229,6 +285,7 @@ static int apds9253_init(const struct device *dev)
 static DEVICE_API(sensor, apds9253_driver_api) = {
 	.sample_fetch = &apds9253_sample_fetch,
 	.channel_get = &apds9253_channel_get,
+	.attr_set = &apds9253_attr_set,
 };
 
 #define APDS9253_INIT(n)                                                                           \
