@@ -85,7 +85,10 @@
 #define APDS9253_LS_THRES_VAR   0x27
 #define APDS9253_DK_CNT_STOR    0x29
 
-enum sensor_attribute_apds9253 { SENSOR_ATTR_GAIN_MODE = SENSOR_ATTR_PRIV_START + 1 };
+enum sensor_attribute_apds9253 {
+	SENSOR_ATTR_GAIN_MODE = SENSOR_ATTR_PRIV_START + 1,
+	SENSOR_ATTR_MEAS_RATE_MES_MODE = SENSOR_ATTR_PRIV_START + 2
+};
 
 enum sensor_gain_apds9253 {
 	APDS9253_SENSOR_GAIN_1,
@@ -93,6 +96,16 @@ enum sensor_gain_apds9253 {
 	APDS9253_SENSOR_GAIN_6,
 	APDS9253_SENSOR_GAIN_9,
 	APDS9253_SENSOR_GAIN_18,
+};
+
+enum sensor_meas_rate_mes_apds9253 {
+	APDS9253_SENSOR_MEAS_RATE_MES_25MS,
+	APDS9253_SENSOR_MEAS_RATE_MES_50MS,
+	APDS9253_SENSOR_MEAS_RATE_MES_100MS,
+	APDS9253_SENSOR_MEAS_RATE_MES_200MS,
+	APDS9253_SENSOR_MEAS_RATE_MES_500MS,
+	APDS9253_SENSOR_MEAS_RATE_MES_1000MS,
+	APDS9253_SENSOR_MEAS_RATE_MES_2000MS,
 };
 
 struct apds9253_config {
@@ -111,6 +124,7 @@ struct apds9253_data {
 	uint32_t sample_crgb[4];
 	uint8_t pdata;
 	enum sensor_gain_apds9253 gain;
+	enum sensor_meas_rate_mes_apds9253 meas_rate_mes;
 	struct k_sem data_sem;
 };
 

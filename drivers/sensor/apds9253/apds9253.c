@@ -162,6 +162,55 @@ static int apds9253_attr_set_gain(const struct device *dev, enum sensor_gain_apd
 	return 0;
 }
 
+static int apds9253_attr_set_meas_rate_mes(const struct device *dev,
+					   enum sensor_meas_rate_mes_apds9253 meas_rate_mes)
+{
+	const struct apds9253_config *config = dev->config;
+	struct apds9253_data *drv_data = dev->data;
+	uint8_t value;
+
+	if (drv_data->meas_rate_mes == meas_rate_mes) {
+		return 0;
+	}
+
+	switch (meas_rate_mes) {
+	case APDS9253_SENSOR_MEAS_RATE_MES_25MS:
+		value = APDS9253_LS_MEAS_RATE_MES_25MS;
+		break;
+	case APDS9253_SENSOR_MEAS_RATE_MES_50MS:
+		value = APDS9253_LS_MEAS_RATE_MES_50MS;
+		break;
+	case APDS9253_SENSOR_MEAS_RATE_MES_100MS:
+		value = APDS9253_LS_MEAS_RATE_MES_100MS;
+		break;
+	case APDS9253_SENSOR_MEAS_RATE_MES_200MS:
+		value = APDS9253_LS_MEAS_RATE_MES_200MS;
+		break;
+	case APDS9253_SENSOR_MEAS_RATE_MES_500MS:
+		value = APDS9253_LS_MEAS_RATE_MES_500MS;
+		break;
+	case APDS9253_SENSOR_MEAS_RATE_MES_1000MS:
+		value = APDS9253_LS_MEAS_RATE_MES_1000MS;
+		break;
+	case APDS9253_SENSOR_MEAS_RATE_MES_2000MS:
+		value = APDS9253_LS_MEAS_RATE_MES_2000MS;
+		break;
+	default:
+		return -EINVAL;
+	}
+
+	if (i2c_reg_update_byte_dt(&config->i2c, APDS9253_LS_MEAS_RATE_REG,
+				   APDS9253_LS_MEAS_RATE_MES_MASK,
+				   (value & APDS9253_LS_MEAS_RATE_MES_MASK))) {
+		LOG_ERR("Not able to set light sensor measurement rate is not set");
+		return -EIO;
+	}
+
+	drv_data->meas_rate_mes = meas_rate_mes;
+
+	return 0;
+}
+
 static int apds9253_attr_set(const struct device *dev, enum sensor_channel chan,
 			     enum sensor_attribute attr, const struct sensor_value *val)
 {
@@ -169,6 +218,9 @@ static int apds9253_attr_set(const struct device *dev, enum sensor_channel chan,
 
 	if (((enum sensor_attribute_apds9253)attr) == SENSOR_ATTR_GAIN_MODE) {
 		ret = apds9253_attr_set_gain(dev, (enum sensor_gain_apds9253)val->val1);
+	} else if (((enum sensor_attribute_apds9253)attr) == SENSOR_ATTR_MEAS_RATE_MES_MODE) {
+		ret = apds9253_attr_set_meas_rate_mes(
+			dev, (enum sensor_meas_rate_mes_apds9253)val->val1);
 	}
 
 	return ret;
@@ -217,6 +269,7 @@ static int apds9253_sensor_setup(const struct device *dev)
 	}
 
 	drv_data->gain = config->ls_gain;
+	drv_data->meas_rate_mes = config->ls_rate;
 
 	return 0;
 }
